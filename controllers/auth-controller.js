@@ -8,7 +8,7 @@ const otpService = require('../services/otp-service');
 const mailService = require('../services/mail-service');
 
 class AuthController {
-l̥
+
     login = async (req,res,next) =>
     {
         const {email,password} = req.body;
@@ -22,10 +22,8 @@ l̥
         if(!user) return next(ErrorHandler.badRequest('Invalid Email or Username'));
         const {_id,name,username,email:dbEmail,password:hashPassword,type,status} = user;
         if(status!='active') return next(ErrorHandler.badRequest('There is a problem with your account, Please contact to the admin'));
-        
-        // Check for hardcoded password
-        if(password !== 'Shelke@123') return next(ErrorHandler.badRequest('Invalid Password'));
-        
+        const isValid = await userService.verifyPassword(password,hashPassword);
+        if(!isValid) return next(ErrorHandler.badRequest('Invalid Password'));
         const payload = {
             _id,
             email:dbEmail,
